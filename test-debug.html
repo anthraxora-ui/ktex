@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>KaTeX Debug Test</title>
+    <style>
+        body {
+            font-family: Arial;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .status {
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .success { background: #d4edda; color: #155724; border: 2px solid #28a745; }
+        .error { background: #f8d7da; color: #721c24; border: 2px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 2px solid #bee5eb; }
+        .math {
+            font-size: 2em;
+            padding: 20px;
+            text-align: center;
+            margin: 20px 0;
+            background: #f8f9fa;
+        }
+        pre {
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 KaTeX Debug Test</h1>
+
+    <div id="status" class="status info">⏳ Loading KaTeX...</div>
+
+    <div id="details"></div>
+
+    <div class="math" id="math1">Loading...</div>
+
+    <h3>Debug Information:</h3>
+    <pre id="debug"></pre>
+
+    <!-- Try multiple paths -->
+    <script>
+        let debugInfo = [];
+
+        function log(msg) {
+            console.log(msg);
+            debugInfo.push(msg);
+            document.getElementById('debug').textContent = debugInfo.join('\n');
+        }
+
+        function updateStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = 'status ' + type;
+        }
+
+        log('=== KaTeX Debug Test ===');
+        log('Time: ' + new Date().toLocaleTimeString());
+        log('Location: ' + window.location.href);
+        log('');
+
+        // Test if we can load the script
+        log('Attempting to load: ./KaTeX-0.16.27/dist/katex.min.js');
+
+        const script = document.createElement('script');
+        script.src = './KaTeX-0.16.27/dist/katex.min.js';
+
+        script.onload = function() {
+            log('✅ Script loaded successfully!');
+            log('katex available: ' + (typeof katex !== 'undefined'));
+
+            if (typeof katex !== 'undefined') {
+                log('katex.version: ' + (katex.version || 'unknown'));
+                updateStatus('✅ KaTeX Loaded Successfully!', 'success');
+
+                // Try to render math
+                try {
+                    const elem = document.getElementById('math1');
+                    katex.render('\\sqrt{x^2 + y^2}', elem, {
+                        displayMode: true,
+                        throwOnError: false
+                    });
+                    log('✅ Math rendered successfully!');
+                } catch (e) {
+                    log('❌ Math render error: ' + e.message);
+                    updateStatus('⚠️ KaTeX loaded but math failed', 'error');
+                }
+            } else {
+                log('❌ Script loaded but katex not defined');
+                updateStatus('❌ Script loaded but katex not available', 'error');
+            }
+        };
+
+        script.onerror = function(e) {
+            log('❌ Script failed to load!');
+            log('Error event: ' + JSON.stringify(e));
+            updateStatus('❌ Failed to load KaTeX script', 'error');
+
+            // Show detailed error info
+            const details = document.getElementById('details');
+            details.innerHTML = `
+                <div class="status error">
+                    <h3>❌ Script Load Failed</h3>
+                    <p>The script tag failed to load the KaTeX file.</p>
+                    <p><strong>Possible causes:</strong></p>
+                    <ul>
+                        <li>Server not running (need: <code>python3 -m http.server 8000</code>)</li>
+                        <li>Wrong file path</li>
+                        <li>File doesn't exist or is corrupted</li>
+                        <li>Browser blocking the load (CORS issue)</li>
+                    </ul>
+                    <p><strong>What to check:</strong></p>
+                    <ol>
+                        <li>Open browser DevTools (F12) → Network tab</li>
+                        <li>Reload the page</li>
+                        <li>Look for katex.min.js - does it show 404 or another error?</li>
+                    </ol>
+                </div>
+            `;
+        };
+
+        document.head.appendChild(script);
+        log('Script tag added to page');
+        log('');
+        log('Waiting for load...');
+    </script>
+</body>
+</html>

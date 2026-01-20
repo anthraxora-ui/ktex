@@ -117,7 +117,7 @@ function createConfig(target /*: Target */, dev /*: boolean */,
             rules: [
                 {
                     test: /\.js$/,
-                    exclude: /node_modules/,
+                    exclude: /node_modules\/(?!perfect-freehand)/,
                     use: 'babel-loader',
                 },
                 {

@@ -14,7 +14,7 @@ import * as mml from "../buildMathML";
 import {calculateSize, makeEm} from "../units";
 
 // Enable handwriting mode for fractions
-const USE_HANDWRITING = true;
+const USE_HANDWRITING = false; // DISABLED: perfect-freehand bundling issue
 
 const adjustStyle = (size, originalStyle) => {
     // Figure out what style this fraction should be in based on the

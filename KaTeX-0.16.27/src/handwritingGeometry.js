@@ -5,7 +5,17 @@
  * into handwritten-style SVG paths.
  */
 
-import getStroke from 'perfect-freehand';
+// Try to import from module, fallback to global if available
+let getStroke;
+try {
+    const pfh = require('perfect-freehand');
+    getStroke = pfh.getStroke || pfh.default || pfh;
+} catch (e) {
+    // Fallback to global if loaded via CDN
+    getStroke = (typeof window !== 'undefined' && window.getStroke) ||
+                (typeof global !== 'undefined' && global.getStroke) ||
+                function() { return []; }; // dummy fallback
+}
 
 /**
  * Convert a stroke array to SVG path data

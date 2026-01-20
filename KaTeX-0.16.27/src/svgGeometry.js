@@ -4,7 +4,12 @@
  * It's a storehouse of path geometry for SVG images.
  */
 
+import {sqrtHandwritten} from "./handwritingGeometry";
+
 // In all paths below, the viewBox-to-em scale is 1000:1.
+
+// Enable handwriting mode for geometry elements
+const USE_HANDWRITING = true;
 
 const hLinePad = 80;  // padding above a sqrt vinculum. Prevents image cropping.
 
@@ -128,6 +133,12 @@ export const sqrtPath = function(
 ): string {
     extraVinculum = 1000 * extraVinculum; // Convert from document ems to viewBox.
     let path = "";
+
+    // Use handwritten style if enabled
+    if (USE_HANDWRITING && (size === "sqrtMain" || size === "sqrtTall")) {
+        path = sqrtHandwritten(extraVinculum, viewBoxHeight);
+        return path;
+    }
 
     switch (size) {
         case "sqrtMain":

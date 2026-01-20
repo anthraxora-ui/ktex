@@ -69,6 +69,8 @@
     "@babel/runtime": "^7.18.9",
     "@rollup/plugin-alias": "^3.1.9",
     "@rollup/plugin-babel": "^5.3.1",
+    "@rollup/plugin-commonjs": "^29.0.0",
+    "@rollup/plugin-node-resolve": "^16.0.3",
     "@semantic-release/changelog": "^6.0.1",
     "@semantic-release/git": "^10.0.1",
     "babel-jest": "^29.0.1",
@@ -160,7 +162,8 @@
     "dist:zip": "rimraf katex/ katex.tar.gz katex.zip && cp -R dist katex && tar czf katex.tar.gz katex && zip -rq katex.zip katex && rimraf katex/"
   },
   "dependencies": {
-    "commander": "^8.3.0"
+    "commander": "^8.3.0",
+    "perfect-freehand": "^1.2.2"
   },
   "husky": {
     "hooks": {

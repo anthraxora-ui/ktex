@@ -6,10 +6,15 @@ import mathMLTree from "../mathMLTree";
 import Style from "../Style";
 import {assertNodeType} from "../parseNode";
 import {assert} from "../utils";
+import {PathNode, SvgNode} from "../domTree";
+import {fractionLineHandwritten} from "../handwritingGeometry";
 
 import * as html from "../buildHTML";
 import * as mml from "../buildMathML";
 import {calculateSize, makeEm} from "../units";
+
+// Enable handwriting mode for fractions
+const USE_HANDWRITING = true;
 
 const adjustStyle = (size, originalStyle) => {
     // Figure out what style this fraction should be in based on the
@@ -60,9 +65,42 @@ const htmlBuilder = (group, options) => {
     if (group.hasBarLine) {
         if (group.barSize) {
             ruleWidth = calculateSize(group.barSize, options);
-            rule = buildCommon.makeLineSpan("frac-line", options, ruleWidth);
+            if (USE_HANDWRITING) {
+                // Create handwritten fraction line using SVG
+                const fracWidth = Math.max(numerm.width, denomm.width);
+                const handwrittenData = fractionLineHandwritten(fracWidth, ruleWidth);
+                const path = new PathNode("frac-line-handwritten", handwrittenData.path);
+                const svg = new SvgNode([path], {
+                    "width": makeEm(fracWidth),
+                    "height": makeEm(ruleWidth),
+                    "viewBox": handwrittenData.viewBox,
+                    "preserveAspectRatio": "none",
+                });
+                rule = buildCommon.makeSvgSpan(["frac-line"], [svg], options);
+                rule.height = ruleWidth;
+                rule.style.height = makeEm(ruleWidth);
+            } else {
+                rule = buildCommon.makeLineSpan("frac-line", options, ruleWidth);
+            }
         } else {
-            rule = buildCommon.makeLineSpan("frac-line", options);
+            if (USE_HANDWRITING) {
+                // Create handwritten fraction line using SVG
+                const fracWidth = Math.max(numerm.width, denomm.width);
+                const defaultThickness = options.fontMetrics().defaultRuleThickness;
+                const handwrittenData = fractionLineHandwritten(fracWidth, defaultThickness);
+                const path = new PathNode("frac-line-handwritten", handwrittenData.path);
+                const svg = new SvgNode([path], {
+                    "width": makeEm(fracWidth),
+                    "height": makeEm(defaultThickness),
+                    "viewBox": handwrittenData.viewBox,
+                    "preserveAspectRatio": "none",
+                });
+                rule = buildCommon.makeSvgSpan(["frac-line"], [svg], options);
+                rule.height = defaultThickness;
+                rule.style.height = makeEm(defaultThickness);
+            } else {
+                rule = buildCommon.makeLineSpan("frac-line", options);
+            }
         }
         ruleWidth = rule.height;
         ruleSpacing = rule.height;

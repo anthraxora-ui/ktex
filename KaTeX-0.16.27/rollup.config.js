@@ -1,5 +1,7 @@
 import babel from '@rollup/plugin-babel';
 import alias from '@rollup/plugin-alias';
+import resolve from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
 
 const {targets} = require('./webpack.common');
 
@@ -14,7 +16,11 @@ export default targets
         format: 'es',
     },
     plugins: [
+        resolve({
+            preferBuiltins: false,
+        }),
         babel({babelHelpers: 'runtime'}),
+        commonjs(),
         alias({
             entries: [
                 {find: 'katex', replacement: '../katex.mjs'},

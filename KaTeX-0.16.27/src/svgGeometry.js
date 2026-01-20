@@ -9,7 +9,7 @@ import {sqrtHandwritten} from "./handwritingGeometry";
 // In all paths below, the viewBox-to-em scale is 1000:1.
 
 // Enable handwriting mode for geometry elements
-const USE_HANDWRITING = true;
+const USE_HANDWRITING = false; // DISABLED: perfect-freehand bundling issue
 
 const hLinePad = 80;  // padding above a sqrt vinculum. Prevents image cropping.
 

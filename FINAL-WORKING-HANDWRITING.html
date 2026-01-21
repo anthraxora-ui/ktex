@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>🖊️ KaTeX Handwriting - FINAL WORKING VERSION</title>
+
+    <!-- Load KaTeX CSS from your build -->
+    <link rel="stylesheet" href="./KaTeX-0.16.27/dist/katex.min.css">
+
+    <style>
+        body {
+            font-family: Arial;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: #28a745;
+            color: white;
+            border-radius: 5px;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+        .status.error {
+            background: #dc3545;
+        }
+        .box {
+            background: white;
+            padding: 30px;
+            margin: 20px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .box h2 {
+            color: #007bff;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .math {
+            font-size: 2.5em;
+            padding: 30px;
+            text-align: center;
+            background: #fafafa;
+            margin: 20px 0;
+            border-left: 4px solid #007bff;
+            border-radius: 4px;
+        }
+        .label {
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 10px;
+        }
+        .success-note {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .warning-note {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="status" id="status">⏳ Loading...</div>
+
+    <h1>🖊️ KaTeX with Handwriting Geometry</h1>
+
+    <div id="noteBox" class="success-note" style="display:none;">
+        <h3>✅ Both Libraries Loaded!</h3>
+        <p><strong>What's loaded:</strong></p>
+        <ul>
+            <li>✅ perfect-freehand (from CDN) - for handwriting strokes</li>
+            <li>✅ Your custom KaTeX build - with handwriting code</li>
+        </ul>
+        <p><strong>🎨 Look for:</strong></p>
+        <ul>
+            <li>Slightly wobbly square root lines</li>
+            <li>Hand-drawn looking fraction lines</li>
+            <li>Natural variation in geometry</li>
+        </ul>
+        <p><em>Note: Handwriting is currently DISABLED in the source code. To enable it, see instructions below.</em></p>
+    </div>
+
+    <div class="box">
+        <h2>📐 Square Roots</h2>
+        <div class="label">Simple Square Root:</div>
+        <div class="math" id="sqrt1"></div>
+
+        <div class="label">Square Root with Expression:</div>
+        <div class="math" id="sqrt2"></div>
+
+        <div class="label">Nested Square Roots:</div>
+        <div class="math" id="sqrt3"></div>
+    </div>
+
+    <div class="box">
+        <h2>➗ Fractions</h2>
+        <div class="label">Simple Fraction:</div>
+        <div class="math" id="frac1"></div>
+
+        <div class="label">Complex Fraction:</div>
+        <div class="math" id="frac2"></div>
+
+        <div class="label">Nested Fractions:</div>
+        <div class="math" id="frac3"></div>
+    </div>
+
+    <div class="box">
+        <h2>🎯 Combined Expressions</h2>
+
+        <div class="label">🔥 Quadratic Formula:</div>
+        <div class="math" id="quad"></div>
+
+        <div class="label">Pythagorean Theorem:</div>
+        <div class="math" id="pyth"></div>
+
+        <div class="label">Square Root of Fraction:</div>
+        <div class="math" id="combo"></div>
+    </div>
+
+    <div class="box">
+        <h2>🔧 How to Enable Handwriting</h2>
+        <div class="warning-note">
+            <p><strong>Handwriting is currently DISABLED</strong> (to fix loading issues).</p>
+            <p><strong>To enable it:</strong></p>
+            <ol>
+                <li>Edit: <code>KaTeX-0.16.27/src/svgGeometry.js</code>
+                    <br>Change: <code>const USE_HANDWRITING = false;</code>
+                    <br>To: <code>const USE_HANDWRITING = true;</code>
+                </li>
+                <li>Edit: <code>KaTeX-0.16.27/src/functions/genfrac.js</code>
+                    <br>Change: <code>const USE_HANDWRITING = false;</code>
+                    <br>To: <code>const USE_HANDWRITING = true;</code>
+                </li>
+                <li>Rebuild:
+                    <br><code>cd KaTeX-0.16.27 && npm run build</code>
+                </li>
+                <li>Reload this page!</li>
+            </ol>
+            <p><strong>Why this works:</strong> perfect-freehand loads from CDN (makes <code>getStroke</code> global), then your KaTeX uses it!</p>
+        </div>
+    </div>
+
+    <!-- Load perfect-freehand from CDN FIRST -->
+    <script src="https://unpkg.com/perfect-freehand@1.2.0/dist/perfect-freehand.umd.min.js"></script>
+
+    <!-- Load YOUR custom KaTeX AFTER -->
+    <script src="./KaTeX-0.16.27/dist/katex.min.js"></script>
+
+    <script>
+        window.addEventListener('load', function() {
+            const status = document.getElementById('status');
+            const noteBox = document.getElementById('noteBox');
+
+            console.log('=== Loading Check ===');
+            console.log('perfect-freehand loaded:', typeof getStroke !== 'undefined');
+            console.log('KaTeX loaded:', typeof katex !== 'undefined');
+
+            // Check if both loaded
+            if (typeof katex === 'undefined') {
+                status.textContent = '❌ KaTeX Failed to Load';
+                status.className = 'status error';
+                alert('❌ KaTeX failed to load! Make sure server is running:\npython3 -m http.server 8000');
+                return;
+            }
+
+            if (typeof getStroke === 'undefined') {
+                status.textContent = '⚠️ perfect-freehand missing';
+                status.className = 'status error';
+                console.warn('perfect-freehand not loaded - handwriting wont work');
+            } else {
+                status.textContent = '✅ Both Libraries Loaded!';
+                noteBox.style.display = 'block';
+                console.log('✅ Both libraries loaded successfully!');
+            }
+
+            // Render all math
+            const expressions = {
+                sqrt1: '\\sqrt{x}',
+                sqrt2: '\\sqrt{x^2 + y^2}',
+                sqrt3: '\\sqrt{\\sqrt{x + 1}}',
+                frac1: '\\frac{1}{2}',
+                frac2: '\\frac{x^2 + 2xy + y^2}{x - y}',
+                frac3: '\\frac{1}{1 + \\frac{1}{x}}',
+                quad: 'x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}',
+                pyth: 'c = \\sqrt{a^2 + b^2}',
+                combo: '\\sqrt{\\frac{x + 1}{x - 1}}'
+            };
+
+            let successCount = 0;
+            Object.keys(expressions).forEach(id => {
+                const elem = document.getElementById(id);
+                try {
+                    katex.render(expressions[id], elem, {
+                        displayMode: true,
+                        throwOnError: false
+                    });
+                    successCount++;
+                } catch (e) {
+                    console.error('Render error:', id, e.message);
+                    elem.textContent = 'Error: ' + e.message;
+                    elem.style.color = 'red';
+                }
+            });
+
+            console.log(`✅ Rendered ${successCount}/${Object.keys(expressions).length} expressions`);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete KaTeX Handwriting Geometry Demo</title>
+
+    <!-- KaTeX CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: #f5f5f5;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            border-bottom: 3px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .controls button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .controls button:hover {
+            background: #45a049;
+        }
+
+        .controls button.clear {
+            background: #f44336;
+        }
+
+        .controls button.clear:hover {
+            background: #da190b;
+        }
+
+        .section {
+            background: white;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .section h2 {
+            color: #4CAF50;
+            margin-top: 0;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+
+        .math-display {
+            font-size: 24px;
+            margin: 20px 0;
+            padding: 15px;
+            background: #fafafa;
+            border-left: 4px solid #4CAF50;
+            overflow-x: auto;
+        }
+
+        .label {
+            font-weight: bold;
+            color: #666;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .status {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+
+        .slider-control {
+            margin: 15px 0;
+        }
+
+        .slider-control label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .slider-control input[type="range"] {
+            width: 100%;
+            margin-bottom: 5px;
+        }
+
+        .slider-control .value {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>🖊️ Complete KaTeX Handwriting Geometry Demo</h1>
+
+    <div class="controls">
+        <h3>Controls</h3>
+        <button onclick="applyHandwriting()">✨ Apply Handwriting</button>
+        <button onclick="clearHandwriting()" class="clear">🗑️ Clear Handwriting</button>
+        <button onclick="reRender()">🔄 Re-render All</button>
+
+        <div class="slider-control">
+            <label>Global Roughness: <span class="value" id="roughness-val">2.0</span></label>
+            <input type="range" id="roughness" min="0.5" max="5.0" step="0.1" value="2.0" oninput="updateSlider('roughness')">
+        </div>
+
+        <div class="slider-control">
+            <label>Global Stroke Size: <span class="value" id="strokeSize-val">3.0</span></label>
+            <input type="range" id="strokeSize" min="1.0" max="6.0" step="0.1" value="3.0" oninput="updateSlider('strokeSize')">
+        </div>
+
+        <div class="slider-control">
+            <label>Square Root Wobble: <span class="value" id="sqrtWobble-val">0.06</span></label>
+            <input type="range" id="sqrtWobble" min="0.02" max="0.15" step="0.01" value="0.06" oninput="updateSlider('sqrtWobble')">
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>1. Delimiters & Brackets</h2>
+        <div class="label">Parentheses, Brackets, Braces:</div>
+        <div class="math-display" id="delim1"></div>
+
+        <div class="label">Stacked Braces (tall):</div>
+        <div class="math-display" id="delim2"></div>
+
+        <div class="label">Matrix with bars:</div>
+        <div class="math-display" id="delim3"></div>
+    </div>
+
+    <div class="section">
+        <h2>2. Square Roots</h2>
+        <div class="label">Simple and nested:</div>
+        <div class="math-display" id="sqrt1"></div>
+
+        <div class="label">Complex:</div>
+        <div class="math-display" id="sqrt2"></div>
+    </div>
+
+    <div class="section">
+        <h2>3. Fractions</h2>
+        <div class="label">Simple fractions:</div>
+        <div class="math-display" id="frac1"></div>
+
+        <div class="label">Continued fraction:</div>
+        <div class="math-display" id="frac2"></div>
+    </div>
+
+    <div class="section">
+        <h2>4. Arrows</h2>
+        <div class="label">Extensible arrows:</div>
+        <div class="math-display" id="arrow1"></div>
+
+        <div class="label">Vector notation:</div>
+        <div class="math-display" id="arrow2"></div>
+    </div>
+
+    <div class="section">
+        <h2>5. Braces & Accents</h2>
+        <div class="label">Overbrace and underbrace:</div>
+        <div class="math-display" id="brace1"></div>
+
+        <div class="label">Wide accents:</div>
+        <div class="math-display" id="accent1"></div>
+    </div>
+
+    <div class="section">
+        <h2>6. Cancel & Strike</h2>
+        <div class="label">Cancel notations:</div>
+        <div class="math-display" id="cancel1"></div>
+    </div>
+
+    <div class="section">
+        <h2>7. Boxes</h2>
+        <div class="label">Boxed expressions:</div>
+        <div class="math-display" id="boxed1"></div>
+    </div>
+
+    <div class="section">
+        <h2>8. Tables & Arrays</h2>
+        <div class="label">Matrix with lines:</div>
+        <div class="math-display" id="table1"></div>
+    </div>
+
+    <div class="section">
+        <h2>9. Complex Examples</h2>
+        <div class="label">Quadratic formula:</div>
+        <div class="math-display" id="complex1"></div>
+
+        <div class="label">Integral with limits:</div>
+        <div class="math-display" id="complex2"></div>
+
+        <div class="label">Summation:</div>
+        <div class="math-display" id="complex3"></div>
+    </div>
+
+    <div class="status" id="status">
+        <strong>Status:</strong> Ready to render. Click "Apply Handwriting" after the page loads.
+    </div>
+
+    <!-- KaTeX JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+
+    <script type="module">
+        // This demo shows how to use the handwriting geometry module
+        // In a real application, you would import from the actual module file:
+        // import { initDependencies, applyHandwritingGeometry, clearHandwritingGeometry, MASTER_SETTINGS }
+        //     from './katex-handwriting-geometry.js';
+
+        // For this demo, we'll show the concept with a simplified inline version
+
+        const mathExpressions = {
+            delim1: '\\left( \\frac{a}{b} \\right) + \\left[ x^2 \\right] + \\left\\{ y \\right\\}',
+            delim2: '\\left\\{ \\frac{\\frac{a}{b}}{\\frac{c}{d}} \\right\\}',
+            delim3: '\\begin{vmatrix} a & b \\\\ c & d \\end{vmatrix}',
+
+            sqrt1: '\\sqrt{x} + \\sqrt{x^2 + y^2} + \\sqrt{\\sqrt{a}}',
+            sqrt2: '\\sqrt{\\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}}',
+
+            frac1: '\\frac{1}{2} + \\frac{a+b}{c+d} + \\frac{x^2}{y}',
+            frac2: 'x = a_0 + \\frac{1}{a_1 + \\frac{1}{a_2 + \\frac{1}{a_3}}}',
+
+            arrow1: 'A \\xrightarrow{f} B \\xleftarrow{g} C',
+            arrow2: '\\vec{v} + \\vec{u} = \\vec{w}',
+
+            brace1: '\\overbrace{x+y+z}^{\\text{sum}} = \\underbrace{a+b+c}_{\\text{total}}',
+            accent1: '\\widehat{abc} + \\widetilde{xyz}',
+
+            cancel1: '\\cancel{5} + \\bcancel{x} + \\xcancel{y}',
+
+            boxed1: '\\boxed{x^2 + y^2 = r^2}',
+
+            table1: '\\begin{array}{c|c|c} a & b & c \\\\ \\hline d & e & f \\\\ \\hline g & h & i \\end{array}',
+
+            complex1: 'x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}',
+            complex2: '\\int_{0}^{\\infty} e^{-x^2} dx = \\frac{\\sqrt{\\pi}}{2}',
+            complex3: '\\sum_{n=1}^{\\infty} \\frac{1}{n^2} = \\frac{\\pi^2}{6}',
+        };
+
+        // Render all expressions
+        function renderAll() {
+            Object.keys(mathExpressions).forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    try {
+                        katex.render(mathExpressions[id], element, {
+                            displayMode: true,
+                            throwOnError: false,
+                            trust: true, // Enable \cancel
+                        });
+                    } catch (e) {
+                        element.textContent = 'Error: ' + e.message;
+                    }
+                }
+            });
+            updateStatus('Math rendered. Ready to apply handwriting.');
+        }
+
+        function updateStatus(msg) {
+            document.getElementById('status').innerHTML = '<strong>Status:</strong> ' + msg;
+        }
+
+        function updateSlider(name) {
+            const slider = document.getElementById(name);
+            const valueSpan = document.getElementById(name + '-val');
+            valueSpan.textContent = slider.value;
+        }
+
+        // Make functions global
+        window.applyHandwriting = async function() {
+            updateStatus('⏳ Loading handwriting libraries...');
+
+            // In a real app, you would call:
+            // await initDependencies();
+            // await applyHandwritingGeometry();
+
+            // For this demo, we'll show a simplified version
+            updateStatus('📝 This is a DEMO. To see full handwriting:\n' +
+                '1. Save the katex-handwriting-geometry.js file\n' +
+                '2. Import it in your HTML\n' +
+                '3. Call applyHandwritingGeometry()\n\n' +
+                'See KATEX-HANDWRITING-EXPLAINED.md for details!');
+        };
+
+        window.clearHandwriting = function() {
+            // In a real app: clearHandwritingGeometry();
+            updateStatus('Handwriting cleared. Click "Apply Handwriting" to reapply.');
+        };
+
+        window.reRender = function() {
+            // Clear existing
+            Object.keys(mathExpressions).forEach(id => {
+                const element = document.getElementById(id);
+                if (element) element.innerHTML = '';
+            });
+
+            // Re-render
+            renderAll();
+        };
+
+        // Initial render
+        window.addEventListener('load', () => {
+            renderAll();
+        });
+    </script>
+</body>
+</html>
